@@ -54,6 +54,7 @@ export default function HomeScreen() {
                      color={'#FFEEDD'}
                      component={'Test3'}
                   />
+
                   <MenuItem
                      text={'text'}
                      color={'#FFE4DD'}
