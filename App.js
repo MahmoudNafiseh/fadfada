@@ -20,11 +20,16 @@ import {
    Button,
    Box,
 } from 'native-base';
+import { StatusBar } from 'expo-status-bar';
+
 import { StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './components/HomeScreen';
+import BottomSheet from './components/BottomSheet';
 import Test1 from './components/Test1';
 import Test2 from './components/Test2';
 import Test3 from './components/Test3';
@@ -43,6 +48,8 @@ export default function App() {
    return (
       <NativeBaseProvider>
          <NavigationContainer>
+            <StatusBar style={'light'} backgroundColor='#18181b' />
+
             <MyStack />
          </NavigationContainer>
       </NativeBaseProvider>
@@ -54,16 +61,33 @@ const Tab = createMaterialBottomTabNavigator();
 function Home() {
    return (
       <Tab.Navigator
-         barStyle={{ backgroundColor: '#000' }}
-         activeColor='#ffffff'
+         barStyle={{
+            backgroundColor: '#000',
+            height: 64,
+         }}
+         activeColor='#FF7900'
+         screenOptions={{
+            headerShown: false,
+         }}
       >
          <Tab.Screen
             name='HomeScreen'
             component={HomeScreen}
             options={{
                tabBarLabel: 'Home',
-
-               tabBarIcon: () => <Entypo name='home' size={24} color='white' />,
+               tabBarIcon: ({ color }) => (
+                  <Entypo name='home' size={24} color={color} />
+               ),
+            }}
+         />
+         <Tab.Screen
+            name='Timeline'
+            component={Test4}
+            options={{
+               tabBarLabel: 'Timeline',
+               tabBarIcon: ({ color }) => (
+                  <Entypo name='chat' size={24} color={color} />
+               ),
             }}
          />
          <Tab.Screen
@@ -71,8 +95,9 @@ function Home() {
             component={Test5}
             options={{
                tabBarLabel: 'Messages',
-
-               tabBarIcon: () => <Entypo name='chat' size={24} color='white' />,
+               tabBarIcon: ({ color }) => (
+                  <Entypo name='chat' size={24} color={color} />
+               ),
             }}
          />
       </Tab.Navigator>
