@@ -1,35 +1,15 @@
 import 'react-native-gesture-handler';
-import React, { useState, useEffect, useRef } from 'react';
-import * as Notifications from 'expo-notifications';
+import React from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Entypo } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
-import {
-   Text,
-   Link,
-   HStack,
-   Center,
-   Spacer,
-   Heading,
-   Switch,
-   View,
-   useColorMode,
-   NativeBaseProvider,
-   extendTheme,
-   VStack,
-   Button,
-   Box,
-} from 'native-base';
+import { NativeBaseProvider, extendTheme } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
 
-import { StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './components/HomeScreen';
-import BottomSheet from './components/BottomSheet';
 import Test1 from './components/Test1';
 import Test2 from './components/Test2';
 import Test3 from './components/Test3';
@@ -44,7 +24,6 @@ const config = {
 export const theme = extendTheme({ config });
 
 export default function App() {
-   const { colorMode, toggleColorMode } = useColorMode();
    return (
       <NativeBaseProvider>
          <NavigationContainer>
