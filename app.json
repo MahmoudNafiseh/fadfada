@@ -1,5 +1,9 @@
 {
    "expo": {
+      "androidStatusBar": {
+         "backgroundColor": "#000001",
+         "translucent": false
+      },
       "plugins": [
          [
             "expo-notifications",
@@ -35,13 +39,15 @@
          "adaptiveIcon": {
             "foregroundImage": "./assets/adaptive-icon.png",
             "backgroundColor": "#FFFFFF"
-         }
+         },
+         "softwareKeyboardLayoutMode": "pan"
       },
       "web": {
          "favicon": "./assets/favicon.png"
       },
       "androidNavigationBar": {
-         "backgroundColor": "#000000"
+         "backgroundColor": "#000000",
+         "barStyle": "light-content"
       }
    }
 }
