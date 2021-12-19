@@ -34,7 +34,6 @@ export default function HomeScreen() {
    const handleChange = (e) => {
       e.preventDefault();
       setMessage(e.target.value);
-      console.log(inputRef.value, message);
    };
 
    return (
