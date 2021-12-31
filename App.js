@@ -10,10 +10,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import HomeScreen from './components/HomeScreen';
+import Timeline from './components/Timeline';
 import Test1 from './components/Test1';
 import Test2 from './components/Test2';
 import Test3 from './components/Test3';
-import Test4 from './components/Test4';
 import Test5 from './components/Test5';
 
 const config = {
@@ -61,7 +61,7 @@ function Home() {
          />
          <Tab.Screen
             name='Timeline'
-            component={Test4}
+            component={Timeline}
             options={{
                tabBarLabel: 'Timeline',
                tabBarIcon: ({ color }) => (
@@ -90,7 +90,6 @@ function MyStack() {
             <Stack.Screen name='Test1' component={Test1} />
             <Stack.Screen name='Test2' component={Test2} />
             <Stack.Screen name='Test3' component={Test3} />
-            <Stack.Screen name='Test4' component={Test4} />
          </Stack.Navigator>
       </SafeAreaProvider>
    );

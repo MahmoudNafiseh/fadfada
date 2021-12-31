@@ -10,7 +10,7 @@ const CreatePost = ({ avatar }) => {
          space={4}
          justifyContent={'center'}
          alignItems={'center'}
-         h={'15%'}
+         h={'40%'}
       >
          <Avatar
             bg='green.500'
