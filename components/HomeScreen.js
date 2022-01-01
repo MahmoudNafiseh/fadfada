@@ -63,7 +63,7 @@ export default function HomeScreen() {
       }
       interval = seconds / 3600;
       if (interval > 1) {
-         return Math.floor(interval) + ' hours  ago';
+         return Math.floor(interval) + ' hours ago';
       }
       interval = seconds / 60;
       if (interval > 1) {
@@ -72,7 +72,6 @@ export default function HomeScreen() {
       return Math.floor(seconds) + ' seconds ago';
    }
 
-   console.log(JSON.stringify(new Date()));
    const throwErr = (name) => {
       throw Error(`${name} noooo`);
    };
