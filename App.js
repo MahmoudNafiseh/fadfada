@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Entypo } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,14 +8,14 @@ import { StatusBar } from 'expo-status-bar';
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import { PostContext } from './PostContext';
 import HomeScreen from './components/HomeScreen';
 import Timeline from './components/Timeline';
 import Test1 from './components/Test1';
-import Test2 from './components/Test2';
+import PostPage from './components/PostPage';
 import Test3 from './components/Test3';
 import Test5 from './components/Test5';
-
+import { fetchAPI } from './fetchAPI';
 const config = {
    useSystemColorMode: false,
    initialColorMode: 'dark',
@@ -23,15 +23,29 @@ const config = {
 
 export const theme = extendTheme({ config });
 
+// export const PostContext = createContext();
 export default function App() {
-   return (
-      <NativeBaseProvider>
-         <NavigationContainer>
-            <StatusBar style={'light'} backgroundColor='#18181b' />
+   const [post, setPost] = useState(null);
+   // async function fetchAPI(setPost) {
+   //    const response = await fetch('http://10.0.2.2:3000/Post').then((res) =>
+   //       res.json()
+   //    );
+   //    setPost(response);
+   //    console.log(response, 'response!');
+   // }
+   useEffect(() => {
+      fetchAPI(setPost);
+   }, []);
 
-            <MyStack />
-         </NavigationContainer>
-      </NativeBaseProvider>
+   return (
+      <PostContext.Provider value={[post, setPost]}>
+         <NativeBaseProvider>
+            <NavigationContainer>
+               <StatusBar style={'light'} backgroundColor='#18181b' />
+               <MyStack />
+            </NavigationContainer>
+         </NativeBaseProvider>
+      </PostContext.Provider>
    );
 }
 
@@ -88,7 +102,7 @@ function MyStack() {
          <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name='Home' component={Home} />
             <Stack.Screen name='Test1' component={Test1} />
-            <Stack.Screen name='Test2' component={Test2} />
+            <Stack.Screen name='PostPage' component={PostPage} />
             <Stack.Screen name='Test3' component={Test3} />
          </Stack.Navigator>
       </SafeAreaProvider>

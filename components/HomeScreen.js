@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import {
    View,
@@ -21,9 +21,10 @@ import MenuItem from './MenuItem';
 import Greeting from './Greeting';
 import CreatePost from './CreatePost';
 import User from '../data/userinfo.json';
-import Post from '../data/userpost.json';
-import { borderWidth } from 'styled-system';
+import HomeScreenNoServer from './HomeScreenNoServer';
+import { PostContext } from '../PostContext';
 import AchievementsHome from './AchievementsHome';
+import Post from '../data/userpost.json';
 
 // Define the config
 const config = {
@@ -39,11 +40,13 @@ export default function HomeScreen() {
    const { colorMode, toggleColorMode } = useColorMode();
    const [modalVisible, setModalVisible] = useState(false);
    const [message, setMessage] = useState('');
+   const [post, setPost] = useContext(PostContext);
 
    const handleChange = (e) => {
       e.preventDefault();
       setMessage(e.target.value);
    };
+   console.log(Post.Post[0]);
 
    function timeSince(date) {
       let seconds = Math.floor((new Date() - Date.parse(date)) / 1000);
@@ -79,99 +82,105 @@ export default function HomeScreen() {
       <SafeAreaProvider>
          <NativeBaseProvider>
             <SafeAreaView style={{ backgroundColor: 'gray.900' }}>
-               <Box
-                  bg={colorMode === 'dark' ? 'black' : 'white'}
-                  pt={2}
-                  alignContent={'flex-start'}
-                  backgroundColor={'gray.900'}
-               >
-                  <Flex
-                     px={5}
-                     style={{
-                        flexDirection: 'column',
-                        height: height - 64,
-                        justifyContent: 'space-evenly',
-                     }}
+               {post ? (
+                  <Box
+                     bg={colorMode === 'dark' ? 'black' : 'white'}
+                     pt={2}
+                     alignContent={'flex-start'}
+                     backgroundColor={'gray.900'}
                   >
-                     {/* the greeting on screen */}
-                     <Box h='10%'>
-                        <Greeting user={User[0].name.split(' ')[0]} />
-                     </Box>
-                     {/* create a post */}
-                     <Flex h='40%' justify='space-evenly'>
-                        <CreatePost avatar={User[0].avatar} />
-                        {/* Achievemenst home button */}
-                        <AchievementsHome />
-                     </Flex>
-                     <Box h='35%' mb='7%'>
-                        <Pressable>
-                           {({ isHovered, isPressed }) => {
-                              return (
-                                 <HStack
-                                    justifyContent={'flex-start'}
-                                    alignItems={'center'}
-                                    space={4}
-                                    w={'100%'}
-                                    h={'100%'}
-                                    px={4}
-                                    borderRadius={'2xl'}
-                                    bg={
-                                       isPressed
-                                          ? '#2b2b2e'
-                                          : isHovered
-                                          ? '#2b2b2e'
-                                          : '#3c3c3f'
-                                    }
-                                 >
+                     <Flex
+                        px={5}
+                        style={{
+                           flexDirection: 'column',
+                           height: height - 64,
+                           justifyContent: 'space-evenly',
+                        }}
+                     >
+                        {/* the greeting on screen */}
+                        <Box h='10%'>
+                           <Greeting user={User[0].name.split(' ')[0]} />
+                        </Box>
+                        {/* create a post */}
+                        <Flex h='40%' justify='space-evenly'>
+                           <CreatePost avatar={User[0].avatar} />
+                           {/* Achievemenst home button */}
+                           <AchievementsHome />
+                        </Flex>
+                        <Box h='35%' mb='7%'>
+                           <Pressable>
+                              {({ isHovered, isPressed }) => {
+                                 return (
                                     <HStack
-                                       justifyContent={'center'}
+                                       justifyContent={'flex-start'}
                                        alignItems={'center'}
-                                       space={2}
+                                       space={4}
+                                       w={'100%'}
+                                       h={'100%'}
+                                       px={4}
+                                       borderRadius={'2xl'}
+                                       bg={
+                                          isPressed
+                                             ? '#2b2b2e'
+                                             : isHovered
+                                             ? '#2b2b2e'
+                                             : '#3c3c3f'
+                                       }
                                     >
-                                       {User[0].id === Post[0].id ? (
-                                          <Flex justify='flex-start'>
-                                             <HStack
-                                                justify='flex-start'
-                                                alignItems={'center'}
-                                                space={4}
-                                                py={5}
-                                                w='100%'
-                                             >
-                                                <Avatar
-                                                   size='md'
-                                                   source={{
-                                                      uri: User[0].avatar,
-                                                   }}
-                                                />
-                                                <Box>
-                                                   <Heading
-                                                      fontSize={'lg'}
-                                                      color='white'
-                                                   >
-                                                      {User[0].name}
-                                                   </Heading>
-                                                   <Text color='gray.500'>
-                                                      {timeSince(Post[0].time)}
+                                       <HStack
+                                          justifyContent={'center'}
+                                          alignItems={'center'}
+                                          space={2}
+                                       >
+                                          {User[0].id === post[0].id ? (
+                                             <Flex justify='flex-start'>
+                                                <HStack
+                                                   justify='flex-start'
+                                                   alignItems={'center'}
+                                                   space={4}
+                                                   py={5}
+                                                   w='100%'
+                                                >
+                                                   <Avatar
+                                                      size='md'
+                                                      source={{
+                                                         uri: User[0].avatar,
+                                                      }}
+                                                   />
+                                                   <Box>
+                                                      <Heading
+                                                         fontSize={'lg'}
+                                                         color='white'
+                                                      >
+                                                         {User[0].name}
+                                                      </Heading>
+                                                      <Text color='gray.500'>
+                                                         {timeSince(
+                                                            post[0].time
+                                                         )}
+                                                      </Text>
+                                                   </Box>
+                                                </HStack>
+                                                <Box h='60%'>
+                                                   <Text color={'white'}>
+                                                      {post[0].body}
                                                    </Text>
                                                 </Box>
-                                             </HStack>
-                                             <Box h='60%'>
-                                                <Text color={'white'}>
-                                                   {Post[0].body}
-                                                </Text>
-                                             </Box>
-                                          </Flex>
-                                       ) : (
-                                          throwErr('post')
-                                       )}
+                                             </Flex>
+                                          ) : (
+                                             throwErr('post')
+                                          )}
+                                       </HStack>
                                     </HStack>
-                                 </HStack>
-                              );
-                           }}
-                        </Pressable>
-                     </Box>
-                  </Flex>
-               </Box>
+                                 );
+                              }}
+                           </Pressable>
+                        </Box>
+                     </Flex>
+                  </Box>
+               ) : (
+                  <HomeScreenNoServer />
+               )}
             </SafeAreaView>
          </NativeBaseProvider>
       </SafeAreaProvider>

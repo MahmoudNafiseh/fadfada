@@ -21,7 +21,7 @@ const CreatePost = ({ avatar }) => {
          />
          <Pressable
             onPress={() => {
-               navigation.navigate('Test2');
+               navigation.navigate('PostPage');
             }}
             borderRadius={'3xl'}
             w={'2/3'}
