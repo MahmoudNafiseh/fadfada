@@ -1,13 +1,29 @@
-import React from 'react';
-import { Box, Heading } from 'native-base';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+   SafeAreaView,
+   FlatList,
+   StyleSheet,
+   Text,
+   View,
+   KeyboardAvoidingView,
+   Platform,
+   Keyboard,
+} from 'react-native';
 
-export default function Test5() {
+import Amplify from 'aws-amplify';
+import { TextInput, Button } from 'react-native';
+
+import { useFormik } from 'formik';
+
+function Test5() {
    return (
       <SafeAreaView>
-         <Box>
-            <Heading>This is where we type our messages!!</Heading>
-         </Box>
+         <View>
+            <Text>Testing</Text>
+         </View>
       </SafeAreaView>
    );
 }
+
+export default Test5;

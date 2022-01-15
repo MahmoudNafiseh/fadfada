@@ -1,4 +1,10 @@
-import React, { useState, useContext, useRef, useCallback, memo } from 'react';
+import React, {
+   useState,
+   useContext,
+   useRef,
+   useCallback,
+   useEffect,
+} from 'react';
 import {
    Box,
    Pressable,
@@ -14,25 +20,34 @@ import {
 import { RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { DataStore } from '@aws-amplify/datastore';
+import { Post } from '../models';
+import { Predicates, SortDirection } from 'aws-amplify';
 import { EvilIcons } from '@expo/vector-icons';
-import Posts from '../data/userpost.json';
+import axios from 'axios';
 import User from '../data/userinfo.json';
 import { PostContext } from '../PostContext';
 import TimelineNoServer from './TimelineNoServer';
 import { fetchAPI } from '../fetchAPI';
 export default function Timeline() {
-   const flatList = useRef(null);
+   const [refreshing, setRefreshing] = useState(false);
+   const [post, setPost] = useContext(PostContext);
    const wait = (timeout) => {
       return new Promise((resolve) => setTimeout(resolve, timeout));
    };
 
-   const [refreshing, setRefreshing] = useState(false);
-   const [post, setPost] = useContext(PostContext);
-
-   const onRefresh = useCallback(() => {
-      fetchAPI(setPost);
+   const onRefresh = useCallback(async () => {
       setRefreshing(true);
-      wait(500).then(() => setRefreshing(false));
+      // fetchAPI(setPost);
+      try {
+         const postData = await DataStore.query(Post, Predicates.ALL, {
+            sort: (s) => s.createdAt(SortDirection.DESCENDING),
+         });
+         setPost(postData);
+      } catch (err) {
+         console.log(err);
+      }
+      wait(1000).then(() => setRefreshing(false));
    }, []);
 
    const renderItem = ({ item }) => (
@@ -65,7 +80,9 @@ export default function Timeline() {
                            <Heading fontSize={'lg'} color='white'>
                               {User[0].name}
                            </Heading>
-                           <Text color='gray.500'>{timeSince(item.time)}</Text>
+                           <Text color='gray.500'>
+                              {timeSince(item.createdAt)}
+                           </Text>
                         </Box>
                      </HStack>
                      <Box>
@@ -91,7 +108,7 @@ export default function Timeline() {
                </HStack>
             </Pressable>
             <Pressable>
-               <HStack justifyContent={'center'} alignItems={'center'}>
+               <HStack w='100%' justifyContent={'center'} alignItems={'center'}>
                   <EvilIcons name='comment' size={24} color='white' />
                   <Text color='white'>Comment</Text>
                </HStack>
@@ -117,6 +134,10 @@ export default function Timeline() {
       }
       interval = seconds / 3600;
       if (interval > 1) {
+         if (Math.floor(interval) === 1) {
+            return Math.floor(interval) + ' hour ago';
+         }
+
          return Math.floor(interval) + ' hours ago';
       }
       interval = seconds / 60;
@@ -133,7 +154,7 @@ export default function Timeline() {
       <SafeAreaView>
          {post ? (
             <FlatList
-               data={post.reverse()}
+               data={post}
                renderItem={renderItem}
                keyExtractor={(item) => item.id.toString()}
                ItemSeparatorComponent={Separator}

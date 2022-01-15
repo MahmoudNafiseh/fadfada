@@ -2,9 +2,16 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, createContext } from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Entypo } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { NativeBaseProvider, extendTheme } from 'native-base';
 import { StatusBar } from 'expo-status-bar';
+import Amplify, { Auth, Predicates, SortDirection } from 'aws-amplify';
+import { withAuthenticator } from 'aws-amplify-react-native';
+import { DataStore } from '@aws-amplify/datastore';
+import { Post } from './models';
+
+import awsconfig from './aws-exports';
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -15,28 +22,34 @@ import Test1 from './components/Test1';
 import PostPage from './components/PostPage';
 import Test3 from './components/Test3';
 import Test5 from './components/Test5';
-import { fetchAPI } from './fetchAPI';
+import fetchAPI from './fetchAPI';
+import { PredicateAll } from '@aws-amplify/datastore/lib-esm/predicates';
 const config = {
    useSystemColorMode: false,
    initialColorMode: 'dark',
 };
 
+Amplify.configure({
+   ...awsconfig,
+   Analytics: {
+      disabled: true,
+   },
+});
 export const theme = extendTheme({ config });
 
 // export const PostContext = createContext();
-export default function App() {
-   const [post, setPost] = useState(null);
-   // async function fetchAPI(setPost) {
-   //    const response = await fetch('http://10.0.2.2:3000/Post').then((res) =>
-   //       res.json()
-   //    );
-   //    setPost(response);
-   //    console.log(response, 'response!');
-   // }
-   useEffect(() => {
-      fetchAPI(setPost);
+function App() {
+   const [post, setPost] = useState([]);
+   useEffect(async () => {
+      try {
+         const postData = await DataStore.query(Post, Predicates.ALL, {
+            sort: (s) => s.createdAt(SortDirection.DESCENDING),
+         });
+         setPost(postData);
+      } catch (err) {
+         console.log(err);
+      }
    }, []);
-
    return (
       <PostContext.Provider value={[post, setPost]}>
          <NativeBaseProvider>
@@ -79,7 +92,7 @@ function Home() {
             options={{
                tabBarLabel: 'Timeline',
                tabBarIcon: ({ color }) => (
-                  <Entypo name='chat' size={24} color={color} />
+                  <MaterialIcons name='timeline' size={24} color={color} />
                ),
             }}
          />
@@ -108,3 +121,5 @@ function MyStack() {
       </SafeAreaProvider>
    );
 }
+
+export default withAuthenticator(App);

@@ -24,7 +24,8 @@ import User from '../data/userinfo.json';
 import HomeScreenNoServer from './HomeScreenNoServer';
 import { PostContext } from '../PostContext';
 import AchievementsHome from './AchievementsHome';
-import Post from '../data/userpost.json';
+import { useNavigation } from '@react-navigation/native';
+// import Post from '../data/userpost.json';
 
 // Define the config
 const config = {
@@ -36,6 +37,7 @@ const config = {
 export const theme = extendTheme({ config });
 
 export default function HomeScreen() {
+   const navigation = useNavigation();
    const { height } = useWindowDimensions();
    const { colorMode, toggleColorMode } = useColorMode();
    const [modalVisible, setModalVisible] = useState(false);
@@ -46,7 +48,6 @@ export default function HomeScreen() {
       e.preventDefault();
       setMessage(e.target.value);
    };
-   console.log(Post.Post[0]);
 
    function timeSince(date) {
       let seconds = Math.floor((new Date() - Date.parse(date)) / 1000);
@@ -66,6 +67,9 @@ export default function HomeScreen() {
       }
       interval = seconds / 3600;
       if (interval > 1) {
+         if (Math.floor(interval) === 1) {
+            return Math.floor(interval) + ' hour ago';
+         }
          return Math.floor(interval) + ' hours ago';
       }
       interval = seconds / 60;
@@ -76,13 +80,13 @@ export default function HomeScreen() {
    }
 
    const throwErr = (name) => {
-      throw Error(`${name} noooo`);
+      throw Error(`Homepage ${name} noooo`);
    };
    return (
       <SafeAreaProvider>
          <NativeBaseProvider>
             <SafeAreaView style={{ backgroundColor: 'gray.900' }}>
-               {post ? (
+               {post.length > 0 ? (
                   <Box
                      bg={colorMode === 'dark' ? 'black' : 'white'}
                      pt={2}
@@ -108,7 +112,11 @@ export default function HomeScreen() {
                            <AchievementsHome />
                         </Flex>
                         <Box h='35%' mb='7%'>
-                           <Pressable>
+                           <Pressable
+                              onPress={() => {
+                                 navigation.navigate('Timeline');
+                              }}
+                           >
                               {({ isHovered, isPressed }) => {
                                  return (
                                     <HStack
@@ -132,44 +140,40 @@ export default function HomeScreen() {
                                           alignItems={'center'}
                                           space={2}
                                        >
-                                          {User[0].id === post[0].id ? (
-                                             <Flex justify='flex-start'>
-                                                <HStack
-                                                   justify='flex-start'
-                                                   alignItems={'center'}
-                                                   space={4}
-                                                   py={5}
-                                                   w='100%'
-                                                >
-                                                   <Avatar
-                                                      size='md'
-                                                      source={{
-                                                         uri: User[0].avatar,
-                                                      }}
-                                                   />
-                                                   <Box>
-                                                      <Heading
-                                                         fontSize={'lg'}
-                                                         color='white'
-                                                      >
-                                                         {User[0].name}
-                                                      </Heading>
-                                                      <Text color='gray.500'>
-                                                         {timeSince(
-                                                            post[0].time
-                                                         )}
-                                                      </Text>
-                                                   </Box>
-                                                </HStack>
-                                                <Box h='60%'>
-                                                   <Text color={'white'}>
-                                                      {post[0].body}
+                                          <Flex justify='flex-start'>
+                                             <HStack
+                                                justify='flex-start'
+                                                alignItems={'center'}
+                                                space={4}
+                                                py={5}
+                                                w='100%'
+                                             >
+                                                <Avatar
+                                                   size='md'
+                                                   source={{
+                                                      uri: User[0].avatar,
+                                                   }}
+                                                />
+                                                <Box>
+                                                   <Heading
+                                                      fontSize={'lg'}
+                                                      color='white'
+                                                   >
+                                                      {User[0].name}
+                                                   </Heading>
+                                                   <Text color='gray.500'>
+                                                      {timeSince(
+                                                         post[0].createdAt
+                                                      )}
                                                    </Text>
                                                 </Box>
-                                             </Flex>
-                                          ) : (
-                                             throwErr('post')
-                                          )}
+                                             </HStack>
+                                             <Box h='60%'>
+                                                <Text color={'white'}>
+                                                   {post[0].body}
+                                                </Text>
+                                             </Box>
+                                          </Flex>
                                        </HStack>
                                     </HStack>
                                  );
@@ -178,9 +182,7 @@ export default function HomeScreen() {
                         </Box>
                      </Flex>
                   </Box>
-               ) : (
-                  <HomeScreenNoServer />
-               )}
+               ) : null}
             </SafeAreaView>
          </NativeBaseProvider>
       </SafeAreaProvider>

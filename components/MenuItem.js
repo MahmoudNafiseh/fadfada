@@ -8,7 +8,6 @@ const MenuItem = ({ text, color, component }) => {
       <Pressable
          onPress={() => {
             navigation.navigate(component);
-            console.log(component);
          }}
       >
          <Box

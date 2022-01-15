@@ -22,11 +22,11 @@
       "slug": "fadfada",
       "version": "1.0.0",
       "orientation": "portrait",
-      "icon": "./assets/icon.png",
+      "icon": "./assets/orange.png",
       "splash": {
-         "image": "./assets/splash.png",
+         "image": "./assets/orangesplash.png",
          "resizeMode": "contain",
-         "backgroundColor": "#ffffff"
+         "backgroundColor": "#000000"
       },
       "updates": {
          "fallbackToCacheTimeout": 0
@@ -37,8 +37,8 @@
       },
       "android": {
          "adaptiveIcon": {
-            "foregroundImage": "./assets/adaptive-icon.png",
-            "backgroundColor": "#FFFFFF"
+            "foregroundImage": "./assets/orange.png",
+            "backgroundColor": "#000000"
          },
          "softwareKeyboardLayoutMode": "pan"
       },
