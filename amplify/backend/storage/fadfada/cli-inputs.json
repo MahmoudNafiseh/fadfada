@@ -1,0 +1,15 @@
+{
+  "resourceName": "fadfada",
+  "policyUUID": "7a48bb3b",
+  "bucketName": "fadfada1b005d6eba684df6ac557a3d652d7b43",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "groupAccess": {}
+}

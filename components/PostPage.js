@@ -13,6 +13,7 @@ import {
    HStack,
    Avatar,
    KeyboardAvoidingView,
+   Image,
    Button,
 } from 'native-base';
 import { Platform } from 'react-native';
@@ -21,13 +22,20 @@ import { PostContext } from '../PostContext';
 import { useNavigation } from '@react-navigation/native';
 import { DataStore } from '@aws-amplify/datastore';
 import { Post } from '../models';
-import { Auth, Predicates, SortDirection } from 'aws-amplify';
+import { Storage, Auth, Predicates, SortDirection } from 'aws-amplify';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+import * as ImagePicker from 'expo-image-picker';
 
 import fetchAPI from '../fetchAPI';
 const PostPage = () => {
    const [post, setPost] = useContext(PostContext);
    const navigation = useNavigation();
    const [userID, setUserID] = useState(null);
+   const [image, setImage] = useState(null);
+   const [uploading, setUploading] = useState(false);
+   const [progress, setProgress] = useState();
+   const [extension, setExtension] = useState('');
    useEffect(() => {
       Auth.currentAuthenticatedUser({
          bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
@@ -35,47 +43,71 @@ const PostPage = () => {
          .then((user) => setUserID(user.attributes.sub))
          .catch((err) => console.log(err));
    }, []);
+   useEffect(() => {
+      (async () => {
+         if (Platform.OS !== 'web') {
+            const { status } =
+               await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+               alert(
+                  'Sorry, we need camera roll permissions to make this work!'
+               );
+               navigation.navigate('Home');
+            }
+         }
+      })();
+   }, []);
+
+   const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+         mediaTypes: ImagePicker.MediaTypeOptions.All,
+         allowsEditing: true,
+         aspect: [16, 9],
+         quality: 1,
+      }).then(setImage(null));
+
+      if (!result.cancelled) {
+         setImage(result.uri);
+         setExtension(result.uri.split('.').pop());
+         setUploading(false);
+      }
+   };
+   const uploadImage = async () => {
+      if (!image) {
+         return;
+      }
+      try {
+         const response = await fetch(image);
+         const blob = await response.blob();
+         let imgKey = uuidv4() + '.' + extension;
+         await Storage.put(imgKey, blob, {
+            progressCallback: (p) => {
+               setProgress(p.loaded / p.total);
+            },
+         });
+         console.log(imgKey, 'uploadimg key');
+         return imgKey;
+      } catch (err) {
+         console.warn('error uploading file: ', err);
+      }
+   };
 
    const createDate = () => {
       return new Date();
    };
 
-   // const BackButton = () => {
-   //    return (
-   //       <Pressable
-   //          onPress={() => navigation.goBack()}
-   //          style={{
-   //             borderBottomColor: '#ffffff15',
-   //             borderBottomWidth: 1,
-   //             minHeight: '36px',
-   //             height: '5%',
-   //          }}
-   //       >
-   //          {({ isHovered, isPressed }) => {
-   //             return (
-   //                <Box
-   //                   bg={
-   //                      isPressed
-   //                         ? '#2b2b2e'
-   //                         : isHovered
-   //                         ? '#2b2b2e'
-   //                         : '#3c3c3f'
-   //                   }
-   //                >
-   //                   <Ionicons name='arrow-back' size={36} color='white' />
-   //                </Box>
-   //             );
-   //          }}
-   //       </Pressable>
-   //    );
-   // };
    const addPost = async (data) => {
+      if (!image) {
+         return alert('Please select an image');
+      }
       try {
+         const key = await uploadImage();
          await DataStore.save(
             new Post({
                body: data.body,
                createdAt: createDate().toJSON(),
                userID: userID,
+               image: key,
                Comments: [],
                Likes: [],
             })
@@ -128,7 +160,7 @@ const PostPage = () => {
                      {({ handleChange, handleBlur, handleSubmit, values }) => (
                         <Flex h='95%'>
                            <HStack
-                              h='90%'
+                              h='30%'
                               justify={'center'}
                               alignContent={'center'}
                            >
@@ -157,7 +189,23 @@ const PostPage = () => {
                                  />
                               </Box>
                            </HStack>
+                           {image && (
+                              <Flex
+                                 justifyContent={'center'}
+                                 alignItems='center'
+                              >
+                                 <Image
+                                    source={{ uri: image }}
+                                    style={{
+                                       height: 200,
+                                       width: undefined,
+                                       aspectRatio: 16 / 9,
+                                    }}
+                                 />
+                              </Flex>
+                           )}
                            <HStack w='100%'>
+                              <Button onPress={pickImage}>Add Image</Button>
                               <Button
                                  bg={'#FF7900'}
                                  size='md'

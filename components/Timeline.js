@@ -8,7 +8,7 @@ import React, {
 import {
    Box,
    Pressable,
-   VStack,
+   Image,
    Flex,
    Heading,
    HStack,
@@ -22,16 +22,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { DataStore } from '@aws-amplify/datastore';
 import { Post } from '../models';
+import { Storage } from 'aws-amplify';
 import { Predicates, SortDirection } from 'aws-amplify';
 import { EvilIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import User from '../data/userinfo.json';
 import { PostContext } from '../PostContext';
 import TimelineNoServer from './TimelineNoServer';
-import { fetchAPI } from '../fetchAPI';
+import RenderItem from './RenderItem';
 export default function Timeline() {
    const [refreshing, setRefreshing] = useState(false);
    const [post, setPost] = useContext(PostContext);
+   const [image, setImage] = useState('');
    const wait = (timeout) => {
       return new Promise((resolve) => setTimeout(resolve, timeout));
    };
@@ -50,68 +52,118 @@ export default function Timeline() {
       wait(1000).then(() => setRefreshing(false));
    }, []);
 
-   const renderItem = ({ item }) => (
-      <Pressable>
-         {({ isHovered, isPressed }) => {
-            return (
-               <HStack
-                  justifyContent={'flex-start'}
-                  alignItems={'center'}
-                  space={4}
-                  w={'100%'}
-                  px={4}
-                  bg={isPressed ? '#2b2b2e' : isHovered ? '#2b2b2e' : '#3c3c3f'}
-               >
-                  <Flex justify='flex-start'>
-                     <HStack
-                        justify='flex-start'
-                        alignItems={'center'}
-                        space={4}
-                        py={5}
-                        w='100%'
-                     >
-                        <Avatar
-                           size='md'
-                           source={{
-                              uri: User[0].avatar,
-                           }}
-                        />
-                        <Box>
-                           <Heading fontSize={'lg'} color='white'>
-                              {User[0].name}
-                           </Heading>
-                           <Text color='gray.500'>
-                              {timeSince(item.createdAt)}
+   const renderItem = ({ item }) => {
+      return (
+         <Pressable>
+            {({ isHovered, isPressed }) => {
+               return (
+                  <HStack
+                     justifyContent={'flex-start'}
+                     alignItems={'center'}
+                     space={4}
+                     w={'100%'}
+                     px={4}
+                     bg={
+                        isPressed
+                           ? '#2b2b2e'
+                           : isHovered
+                           ? '#2b2b2e'
+                           : '#3c3c3f'
+                     }
+                  >
+                     <Flex justify='flex-start'>
+                        <HStack
+                           justify='flex-start'
+                           alignItems={'center'}
+                           space={4}
+                           py={5}
+                           w='100%'
+                        >
+                           <Avatar
+                              size='md'
+                              source={{
+                                 uri: User[0].avatar,
+                              }}
+                           />
+                           <Box>
+                              <Heading fontSize={'lg'} color='white'>
+                                 {User[0].name}
+                              </Heading>
+                              <Text color='gray.500'>
+                                 {timeSince(item.createdAt)}
+                              </Text>
+                           </Box>
+                        </HStack>
+                        <Box pb='6'>
+                           <Text fontSize={'md'} color={'white'}>
+                              {item.body}
                            </Text>
                         </Box>
-                     </HStack>
-                     <Box>
-                        <Text fontSize={'md'} color={'white'}>
-                           {item.body}
-                        </Text>
-                     </Box>
-                     <LikeComment />
-                  </Flex>
-               </HStack>
-            );
-         }}
-      </Pressable>
-   );
+                        {item.image && <Image source={{ uri: item.image }} />}
+                        <Box borderTopWidth={1} borderTopColor={'#00000050'}>
+                           <LikeComment />
+                        </Box>
+                     </Flex>
+                  </HStack>
+               );
+            }}
+         </Pressable>
+      );
+   };
 
    const LikeComment = React.memo(() => {
       return (
-         <HStack py={5} justifyContent={'space-evenly'}>
-            <Pressable>
-               <HStack justifyContent={'center'} alignItems={'center'}>
-                  <EvilIcons name='like' size={24} color='white' />
-                  <Text color='white'>Like</Text>
-               </HStack>
+         <HStack
+            w='100%'
+            justifyContent={'space-evenly'}
+            alignItems={'center'}
+            h='55px'
+         >
+            <Pressable w='50%'>
+               {({ isHovered, isPressed }) => {
+                  return (
+                     <HStack
+                        w='100%'
+                        h='50px'
+                        borderRightWidth={1}
+                        borderRightColor={'#00000050'}
+                        bg={
+                           isPressed
+                              ? '#2b2b2e'
+                              : isHovered
+                              ? '#2b2b2e'
+                              : '#3c3c3f'
+                        }
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                     >
+                        <EvilIcons name='like' size={24} color='white' />
+                        <Text color='white'>Like</Text>
+                     </HStack>
+                  );
+               }}
             </Pressable>
-            <Pressable>
-               <HStack w='100%' justifyContent={'center'} alignItems={'center'}>
-                  <EvilIcons name='comment' size={24} color='white' />
-                  <Text color='white'>Comment</Text>
-               </HStack>
+            <Pressable w='50%'>
+               {({ isHovered, isPressed }) => {
+                  return (
+                     <HStack
+                        w='100%'
+                        h='50px'
+                        bg={
+                           isPressed
+                              ? '#2b2b2e'
+                              : isHovered
+                              ? '#2b2b2e'
+                              : '#3c3c3f'
+                        }
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                     >
+                        <EvilIcons name='comment' size={24} color='white' />
+                        <Text color='white'>Comment</Text>
+                     </HStack>
+                  );
+               }}
             </Pressable>
          </HStack>
       );
@@ -155,7 +207,7 @@ export default function Timeline() {
          {post ? (
             <FlatList
                data={post}
-               renderItem={renderItem}
+               renderItem={({ item }) => <RenderItem item={item} />}
                keyExtractor={(item) => item.id.toString()}
                ItemSeparatorComponent={Separator}
                // refreshControl={
