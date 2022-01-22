@@ -78,6 +78,15 @@ export const schema = {
                                     "delete",
                                     "read"
                                 ]
+                            },
+                            {
+                                "allow": "private",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
                             }
                         ]
                     }
@@ -169,6 +178,15 @@ export const schema = {
                                     "delete",
                                     "read"
                                 ]
+                            },
+                            {
+                                "allow": "private",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
                             }
                         ]
                     }
@@ -231,7 +249,7 @@ export const schema = {
                     "name": "Likes",
                     "isArray": true,
                     "type": {
-                        "model": "Likes"
+                        "model": "Comment"
                     },
                     "isRequired": true,
                     "attributes": [],
@@ -278,6 +296,15 @@ export const schema = {
                                     "delete",
                                     "read"
                                 ]
+                            },
+                            {
+                                "allow": "private",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
                             }
                         ]
                     }
@@ -294,17 +321,10 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "name": {
-                    "name": "name",
+                "firstName": {
+                    "name": "firstName",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "email": {
-                    "name": "email",
-                    "isArray": false,
-                    "type": "AWSEmail",
                     "isRequired": true,
                     "attributes": []
                 },
@@ -319,7 +339,7 @@ export const schema = {
                     "name": "Posts",
                     "isArray": true,
                     "type": {
-                        "model": "Post"
+                        "model": "Comment"
                     },
                     "isRequired": true,
                     "attributes": [],
@@ -347,7 +367,7 @@ export const schema = {
                     "name": "Likes",
                     "isArray": true,
                     "type": {
-                        "model": "Likes"
+                        "model": "Comment"
                     },
                     "isRequired": true,
                     "attributes": [],
@@ -356,6 +376,27 @@ export const schema = {
                         "connectionType": "HAS_MANY",
                         "associatedWith": "userID"
                     }
+                },
+                "lastName": {
+                    "name": "lastName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "sub": {
+                    "name": "sub",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "checked": {
+                    "name": "checked",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
+                    "attributes": []
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -386,12 +427,30 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
+                                "provider": "userPools",
+                                "ownerField": "owner",
+                                "allow": "owner",
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "update"
+                                ],
+                                "identityClaim": "cognito:username"
+                            },
+                            {
+                                "allow": "private",
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "update"
+                                ]
+                            },
+                            {
                                 "allow": "public",
                                 "operations": [
                                     "create",
-                                    "update",
-                                    "delete",
-                                    "read"
+                                    "read",
+                                    "update"
                                 ]
                             }
                         ]
@@ -402,5 +461,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "b7c931a7e80565494c54057bed5eaa16"
+    "version": "2f0a0ccc2d4e879ab669f169bf5e7c2e"
 };

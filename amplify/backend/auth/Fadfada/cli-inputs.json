@@ -2,7 +2,7 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "testAuthIdentityPool",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "fadfad6e2ad53c",
     "userPoolName": "Fadfada",
     "autoVerifiedAttributes": [
@@ -16,7 +16,7 @@
     "smsVerificationMessage": "Your verification code is {####}",
     "emailVerificationSubject": "Forgot password code: {####}",
     "emailVerificationMessage": "Forgot password code: {####}",
-    "defaultPasswordPolicy": false,
+    "defaultPasswordPolicy": true,
     "passwordPolicyMinLength": 6,
     "passwordPolicyCharacters": [
       "Requires Lowercase",
@@ -30,10 +30,16 @@
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
-    "userpoolClientWriteAttributes": [],
-    "userpoolClientReadAttributes": [],
+    "userpoolClientWriteAttributes": [
+      "email",
+      "phone_number",
+      "profile"
+    ],
+    "userpoolClientReadAttributes": [
+      "name"
+    ],
     "userpoolClientLambdaRole": "Fadfad6e2ad53c_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": false,
+    "userpoolClientSetAttributes": true,
     "sharedId": "6e2ad53c",
     "resourceName": "Fadfada",
     "authSelections": "identityPoolAndUserPool",
@@ -45,7 +51,7 @@
     "userPoolGroups": false,
     "userPoolGroupList": [],
     "adminQueries": false,
-    "thirdPartyAuth": false,
+    "thirdPartyAuth": true,
     "authProviders": [],
     "usernameCaseSensitive": false,
     "useEnabledMfas": true,
@@ -62,6 +68,12 @@
       ]
     },
     "breakCircularDependency": true,
-    "dependsOn": []
+    "dependsOn": [],
+    "hostedUI": false,
+    "triggers": {},
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "permissions": []
   }
 }

@@ -49,7 +49,7 @@ export default function Timeline() {
       } catch (err) {
          console.log(err);
       }
-      wait(1000).then(() => setRefreshing(false));
+      wait(200).then(() => setRefreshing(false));
    }, []);
 
    const renderItem = ({ item }) => {
@@ -203,7 +203,10 @@ export default function Timeline() {
       return <View bg='black' h='5px' />;
    };
    return (
-      <SafeAreaView>
+      <SafeAreaView
+         backgroundColor={'black'}
+         style={{ backgroundColor: '#000000', height: '100%' }}
+      >
          {post ? (
             <FlatList
                data={post}
@@ -216,8 +219,9 @@ export default function Timeline() {
                //       onRefresh={onRefresh}
                //    />
                // }
-
-               maxToRenderPerBatch={30}
+               contentContainerStyle={{ backgroundColor: '#000000' }}
+               style={{ backgroundColor: 'black' }}
+               maxToRenderPerBatch={10}
                refreshing={refreshing}
                onRefresh={onRefresh}
                extraData={post}

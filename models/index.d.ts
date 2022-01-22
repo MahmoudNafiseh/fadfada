@@ -48,7 +48,7 @@ export declare class Post {
   readonly image?: string;
   readonly userID?: string;
   readonly Comments?: (Comment | null)[];
-  readonly Likes?: Likes[];
+  readonly Likes?: Comment[];
   readonly updatedAt?: string;
   constructor(init: ModelInit<Post, PostMetaData>);
   static copyOf(source: Post, mutator: (draft: MutableModel<Post, PostMetaData>) => MutableModel<Post, PostMetaData> | void): Post;
@@ -56,12 +56,14 @@ export declare class Post {
 
 export declare class User {
   readonly id: string;
-  readonly name: string;
-  readonly email: string;
+  readonly firstName: string;
   readonly image?: string;
-  readonly Posts?: Post[];
+  readonly Posts?: Comment[];
   readonly Comments?: Comment[];
-  readonly Likes?: Likes[];
+  readonly Likes?: Comment[];
+  readonly lastName: string;
+  readonly sub: string;
+  readonly checked: boolean;
   readonly createdAt?: string;
   readonly updatedAt?: string;
   constructor(init: ModelInit<User, UserMetaData>);

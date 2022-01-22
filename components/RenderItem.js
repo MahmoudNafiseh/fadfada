@@ -22,7 +22,6 @@ const RenderItem = ({ item }) => {
       else Storage.get(item.image).then(setImage);
    }, [item]);
 
-   console.log(image);
    const LikeComment = React.memo(() => {
       return (
          <HStack

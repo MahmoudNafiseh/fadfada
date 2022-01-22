@@ -3,19 +3,19 @@
   "serviceConfiguration": {
     "apiName": "Fadfada",
     "serviceName": "AppSync",
-    "gqlSchemaPath": "/tmp/amplify-f14e28a7-f701-461c-b6c3-68819df748be/amplify/backend/api/Fadfada/schema.graphql",
+    "gqlSchemaPath": "/tmp/amplify-5bc0fa89-3266-41ab-862f-570db16e5277/amplify/backend/api/Fadfada/schema.graphql",
     "defaultAuthType": {
-      "mode": "API_KEY",
-      "keyDescription": "api key description",
-      "expirationTime": 30
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "authFadfada"
     },
     "additionalAuthTypes": [
       {
-        "mode": "AWS_IAM"
+        "mode": "API_KEY",
+        "keyDescription": "api key description",
+        "expirationTime": 30
       },
       {
-        "mode": "AMAZON_COGNITO_USER_POOLS",
-        "cognitoUserPoolId": "authFadfada"
+        "mode": "AWS_IAM"
       }
     ],
     "conflictResolution": {

@@ -1,5 +1,5 @@
 // Formik x React Native example
-import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { TextInput, View, Keyboard, Dimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
@@ -27,7 +27,6 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import * as ImagePicker from 'expo-image-picker';
 
-import fetchAPI from '../fetchAPI';
 const PostPage = () => {
    const [post, setPost] = useContext(PostContext);
    const navigation = useNavigation();
@@ -36,6 +35,7 @@ const PostPage = () => {
    const [uploading, setUploading] = useState(false);
    const [progress, setProgress] = useState();
    const [extension, setExtension] = useState('');
+   const formikRef = useRef();
    useEffect(() => {
       Auth.currentAuthenticatedUser({
          bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
@@ -85,7 +85,6 @@ const PostPage = () => {
                setProgress(p.loaded / p.total);
             },
          });
-         console.log(imgKey, 'uploadimg key');
          return imgKey;
       } catch (err) {
          console.warn('error uploading file: ', err);
@@ -97,9 +96,6 @@ const PostPage = () => {
    };
 
    const addPost = async (data) => {
-      if (!image) {
-         return alert('Please select an image');
-      }
       try {
          const key = await uploadImage();
          await DataStore.save(
@@ -138,16 +134,33 @@ const PostPage = () => {
                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                style={{ backgroundColor: '#18181b' }}
             >
-               <Box h='5%' minH={'36px'}>
-                  <Pressable
-                     onPress={() => navigation.goBack()}
-                     style={{
-                        borderBottomColor: '#ffffff15',
-                        borderBottomWidth: 1,
-                     }}
-                  >
-                     <Ionicons name='arrow-back' size={36} color='white' />
-                  </Pressable>
+               <Box
+                  h='5%'
+                  w='100%'
+                  minH={'40px'}
+                  style={{
+                     borderBottomColor: '#ffffff15',
+                     borderBottomWidth: 1,
+                  }}
+               >
+                  <HStack w='100%' justifyContent='space-between'>
+                     <Pressable onPress={() => navigation.goBack()}>
+                        <Ionicons name='arrow-back' size={36} color='white' />
+                     </Pressable>
+                     <Button
+                        bg={'#FF7900'}
+                        size='md'
+                        onPress={() => formikRef.current.handleSubmit()}
+                        title='Submit'
+                        fontWeight={'bold'}
+                        w='30%'
+                        colorScheme='orange'
+                        mb='1'
+                        rounded={'none'}
+                     >
+                        SUBMIT
+                     </Button>
+                  </HStack>
                </Box>
                <Box mt='5' backgroundColor={'#18181b'} h={'95%'}>
                   <Formik
@@ -156,11 +169,13 @@ const PostPage = () => {
                         userid: User[0].id,
                      }}
                      onSubmit={(values) => addPost(values)}
+                     innerRef={formikRef}
                   >
                      {({ handleChange, handleBlur, handleSubmit, values }) => (
                         <Flex h='95%'>
                            <HStack
                               h='30%'
+                              minH='200px'
                               justify={'center'}
                               alignContent={'center'}
                            >
@@ -172,9 +187,6 @@ const PostPage = () => {
                                  ml='2'
                               />
                               <Box ml='5'>
-                                 {/* <Text fontSize={20} color='gray.500'>
-                                       What's happening?
-                                    </Text> */}
                                  <TextInput
                                     style={{ borderColor: '#00000050' }}
                                     autoFocus
@@ -182,9 +194,10 @@ const PostPage = () => {
                                     onBlur={handleBlur('body')}
                                     value={values.email}
                                     placeholder="What's happening?"
-                                    style={{ fontSize: 20, maxWidth: '90%' }}
+                                    style={{ fontSize: 20, maxWidth: '100%' }}
                                     color='white'
                                     multiline
+                                    selectionColor={'#FF7900'}
                                     placeholderTextColor={'#9E9E9E'}
                                  />
                               </Box>
@@ -205,16 +218,12 @@ const PostPage = () => {
                               </Flex>
                            )}
                            <HStack w='100%'>
-                              <Button onPress={pickImage}>Add Image</Button>
                               <Button
-                                 bg={'#FF7900'}
-                                 size='md'
-                                 onPress={handleSubmit}
-                                 title='Submit'
-                                 fontWeight={'bold'}
-                                 w='100%'
+                                 bg='#FF7900'
+                                 colorScheme='orange'
+                                 onPress={pickImage}
                               >
-                                 SUBMIT
+                                 Add Image
                               </Button>
                            </HStack>
                         </Flex>
