@@ -20,9 +20,10 @@ import { Entypo } from '@expo/vector-icons';
 import MenuItem from './MenuItem';
 import Greeting from './Greeting';
 import CreatePost from './CreatePost';
-import User from '../data/userinfo.json';
-import HomeScreenNoServer from './HomeScreenNoServer';
+import { User } from '../models';
+import { DataStore } from '@aws-amplify/datastore';
 import { PostContext } from '../PostContext';
+import { Auth } from 'aws-amplify';
 import AchievementsHome from './AchievementsHome';
 import { useNavigation } from '@react-navigation/native';
 // import Post from '../data/userpost.json';
@@ -40,10 +41,24 @@ export default function HomeScreen() {
    const navigation = useNavigation();
    const { height } = useWindowDimensions();
    const { colorMode, toggleColorMode } = useColorMode();
-   const [modalVisible, setModalVisible] = useState(false);
    const [message, setMessage] = useState('');
    const [post, setPost] = useContext(PostContext);
-
+   const [user, setUser] = useState();
+   const [profile, setProfile] = useState([]);
+   useEffect(async () => {
+      try {
+         Auth.currentAuthenticatedUser({
+            bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
+         })
+            .then((user) => setUser(user.attributes.sub))
+            .then(
+               setProfile(await DataStore.query(User, (c) => c.sub('eq', user)))
+            )
+            .catch((err) => console.log(err));
+      } catch (Err) {
+         console.warn(Err);
+      }
+   });
    const handleChange = (e) => {
       e.preventDefault();
       setMessage(e.target.value);
@@ -86,7 +101,7 @@ export default function HomeScreen() {
       <SafeAreaProvider>
          <NativeBaseProvider>
             <SafeAreaView style={{ backgroundColor: 'gray.900' }}>
-               {post.length > 0 ? (
+               {post.length > 0 && profile.length > 0 ? (
                   <Box
                      bg={colorMode === 'dark' ? 'black' : 'white'}
                      pt={2}
@@ -103,11 +118,11 @@ export default function HomeScreen() {
                      >
                         {/* the greeting on screen */}
                         <Box h='10%'>
-                           <Greeting user={User[0].name.split(' ')[0]} />
+                           <Greeting user={profile[0].firstName} />
                         </Box>
                         {/* create a post */}
                         <Flex h='40%' justify='space-evenly'>
-                           <CreatePost avatar={User[0].avatar} />
+                           <CreatePost avatar={profile[0].image} />
                            {/* Achievemenst home button */}
                            <AchievementsHome />
                         </Flex>
@@ -151,15 +166,17 @@ export default function HomeScreen() {
                                                 <Avatar
                                                    size='md'
                                                    source={{
-                                                      uri: User[0].avatar,
+                                                      uri: profile[0].image,
                                                    }}
+                                                   bg={'#FF7900'}
                                                 />
                                                 <Box>
                                                    <Heading
                                                       fontSize={'lg'}
                                                       color='white'
                                                    >
-                                                      {User[0].name}
+                                                      {profile[0].firstName}{' '}
+                                                      {profile[0].lastName}
                                                    </Heading>
                                                    <Text color='gray.500'>
                                                       {timeSince(

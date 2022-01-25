@@ -13,7 +13,7 @@ const CreatePost = ({ avatar }) => {
          h={'40%'}
       >
          <Avatar
-            bg='green.500'
+            bg='#FF7900'
             source={{
                uri: avatar,
             }}

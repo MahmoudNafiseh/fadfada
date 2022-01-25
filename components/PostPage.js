@@ -1,10 +1,17 @@
 // Formik x React Native example
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { TextInput, View, Keyboard, Dimensions } from 'react-native';
+import {
+   TextInput,
+   View,
+   Keyboard,
+   Dimensions,
+   ActivityIndicator,
+} from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { Entypo } from '@expo/vector-icons';
 import {
    Flex,
    Box,
@@ -17,15 +24,16 @@ import {
    Button,
 } from 'native-base';
 import { Platform } from 'react-native';
-import User from '../data/userinfo.json';
 import { PostContext } from '../PostContext';
 import { useNavigation } from '@react-navigation/native';
 import { DataStore } from '@aws-amplify/datastore';
-import { Post } from '../models';
+import { Post, User } from '../models';
 import { Storage, Auth, Predicates, SortDirection } from 'aws-amplify';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import * as ImagePicker from 'expo-image-picker';
+import { ProfileContext } from '../ProfileContext';
+import { AntDesign } from '@expo/vector-icons';
 
 const PostPage = () => {
    const [post, setPost] = useContext(PostContext);
@@ -35,14 +43,8 @@ const PostPage = () => {
    const [uploading, setUploading] = useState(false);
    const [progress, setProgress] = useState();
    const [extension, setExtension] = useState('');
+   const [profile, setProfile] = useContext(ProfileContext);
    const formikRef = useRef();
-   useEffect(() => {
-      Auth.currentAuthenticatedUser({
-         bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
-      })
-         .then((user) => setUserID(user.attributes.sub))
-         .catch((err) => console.log(err));
-   }, []);
    useEffect(() => {
       (async () => {
          if (Platform.OS !== 'web') {
@@ -62,7 +64,7 @@ const PostPage = () => {
       let result = await ImagePicker.launchImageLibraryAsync({
          mediaTypes: ImagePicker.MediaTypeOptions.All,
          allowsEditing: true,
-         aspect: [16, 9],
+         aspect: [4, 3],
          quality: 1,
       }).then(setImage(null));
 
@@ -102,7 +104,7 @@ const PostPage = () => {
             new Post({
                body: data.body,
                createdAt: createDate().toJSON(),
-               userID: userID,
+               userID: profile[0].sub,
                image: key,
                Comments: [],
                Likes: [],
@@ -166,25 +168,27 @@ const PostPage = () => {
                   <Formik
                      initialValues={{
                         body: '',
-                        userid: User[0].id,
+                        userid: profile[0].sub,
                      }}
                      onSubmit={(values) => addPost(values)}
                      innerRef={formikRef}
                   >
                      {({ handleChange, handleBlur, handleSubmit, values }) => (
-                        <Flex h='95%'>
+                        <Flex h='100%'>
                            <HStack
-                              h='30%'
-                              minH='200px'
+                              h='50%'
+                              minH='100px'
+                              maxH='100px'
                               justify={'center'}
                               alignContent={'center'}
                            >
                               <Avatar
                                  size='md'
                                  source={{
-                                    uri: User[0].avatar,
+                                    uri: profile[0].image,
                                  }}
                                  ml='2'
+                                 bg='#FF7900'
                               />
                               <Box ml='5'>
                                  <TextInput
@@ -194,7 +198,10 @@ const PostPage = () => {
                                     onBlur={handleBlur('body')}
                                     value={values.email}
                                     placeholder="What's happening?"
-                                    style={{ fontSize: 20, maxWidth: '100%' }}
+                                    style={{
+                                       fontSize: 20,
+                                       maxWidth: '95%',
+                                    }}
                                     color='white'
                                     multiline
                                     selectionColor={'#FF7900'}
@@ -207,25 +214,64 @@ const PostPage = () => {
                                  justifyContent={'center'}
                                  alignItems='center'
                               >
-                                 <Image
-                                    source={{ uri: image }}
-                                    style={{
-                                       height: 200,
-                                       width: undefined,
-                                       aspectRatio: 16 / 9,
-                                    }}
-                                 />
+                                 <HStack justifyContent={'center'}>
+                                    <Button
+                                       colorScheme='orange'
+                                       bg='black'
+                                       opacity={0.85}
+                                       size={10}
+                                       rounded={'full'}
+                                       position={'absolute'}
+                                       zIndex={1000}
+                                       right={2}
+                                       top={2}
+                                       onPress={() => setImage(null)}
+                                    >
+                                       <AntDesign
+                                          name='close'
+                                          size={24}
+                                          color='white'
+                                       />
+                                    </Button>
+                                    <Image
+                                       source={{ uri: image }}
+                                       style={{
+                                          height: undefined,
+                                          width: '75%',
+                                          aspectRatio: 4 / 3,
+                                          borderRadius: 10,
+                                       }}
+                                       alt='Image preview'
+                                    />
+                                 </HStack>
                               </Flex>
                            )}
-                           <HStack w='100%'>
-                              <Button
-                                 bg='#FF7900'
-                                 colorScheme='orange'
-                                 onPress={pickImage}
+                           <Flex
+                              justifyContent={'flex-end'}
+                              h='250px'
+                              // maxH={'50%'}
+                           >
+                              <HStack
+                                 w='100%'
+                                 h='100%'
+                                 justifyContent={'flex-start'}
                               >
-                                 Add Image
-                              </Button>
-                           </HStack>
+                                 <Pressable>
+                                    <Button
+                                       bg='#FF7900'
+                                       colorScheme='orange'
+                                       onPress={pickImage}
+                                       mt={2}
+                                    >
+                                       <Entypo
+                                          name='images'
+                                          size={24}
+                                          color='black'
+                                       />
+                                    </Button>
+                                 </Pressable>
+                              </HStack>
+                           </Flex>
                         </Flex>
                      )}
                   </Formik>

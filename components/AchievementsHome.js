@@ -1,10 +1,13 @@
 import React from 'react';
 import { Pressable, Box, HStack, Avatar, Heading } from 'native-base';
 import { Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const AchievementsHome = () => {
+   const navigation = useNavigation();
+
    return (
-      <Pressable h='40%'>
+      <Pressable h='40%' onPress={() => navigation.navigate('Test1')}>
          {({ isHovered, isPressed }) => {
             return (
                <HStack

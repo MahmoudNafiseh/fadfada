@@ -16,10 +16,12 @@ import {
    Avatar,
    Text,
    View,
+   Button,
 } from 'native-base';
 import { RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { DataStore } from '@aws-amplify/datastore';
 import { Post } from '../models';
 import { Storage } from 'aws-amplify';
@@ -30,10 +32,13 @@ import User from '../data/userinfo.json';
 import { PostContext } from '../PostContext';
 import TimelineNoServer from './TimelineNoServer';
 import RenderItem from './RenderItem';
+import { useNavigation } from '@react-navigation/native';
+
 export default function Timeline() {
    const [refreshing, setRefreshing] = useState(false);
    const [post, setPost] = useContext(PostContext);
    const [image, setImage] = useState('');
+   const navigation = useNavigation();
    const wait = (timeout) => {
       return new Promise((resolve) => setTimeout(resolve, timeout));
    };
@@ -84,6 +89,7 @@ export default function Timeline() {
                               source={{
                                  uri: User[0].avatar,
                               }}
+                              bg='#FF7900'
                            />
                            <Box>
                               <Heading fontSize={'lg'} color='white'>
@@ -207,31 +213,30 @@ export default function Timeline() {
          backgroundColor={'black'}
          style={{ backgroundColor: '#000000', height: '100%' }}
       >
+         <Box zIndex={1000} position={'absolute'} bottom={30} right={5}>
+            <Button
+               colorScheme='orange'
+               bg='#FF7900'
+               size={'16'}
+               borderRadius={'full'}
+               onPress={() => navigation.navigate('PostPage')}
+            >
+               <FontAwesome5 name='feather-alt' style size={28} color='black' />
+            </Button>
+         </Box>
          {post ? (
             <FlatList
+               zIndex={-100}
                data={post}
                renderItem={({ item }) => <RenderItem item={item} />}
                keyExtractor={(item) => item.id.toString()}
                ItemSeparatorComponent={Separator}
-               // refreshControl={
-               //    <RefreshControl
-               //       refreshing={refreshing}
-               //       onRefresh={onRefresh}
-               //    />
-               // }
                contentContainerStyle={{ backgroundColor: '#000000' }}
                style={{ backgroundColor: 'black' }}
                maxToRenderPerBatch={10}
                refreshing={refreshing}
                onRefresh={onRefresh}
                extraData={post}
-               // onContentSizeChange={() =>
-               //    flatList.current.scrollToIndex({ index: 0, animated: true })
-               // }
-               // onLayout={() =>
-               //    flatList.current.scrollToIndex({ index: 0, animated: true })
-               // }
-               // refreshControl={}
             />
          ) : (
             <TimelineNoServer />

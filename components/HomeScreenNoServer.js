@@ -139,6 +139,7 @@ export default function HomeScreenNoServer() {
                                           source={{
                                              uri: User[0].avatar,
                                           }}
+                                          bg='#FF7900'
                                        />
                                        <Box>
                                           <Heading
